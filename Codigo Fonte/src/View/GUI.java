@@ -235,40 +235,25 @@ public class GUI extends JFrame {
 
         messageArea.setText("");
         String codigo = editorArea.getText();
+        Lexico lexico = new Lexico(codigo);
+        Sintatico sintatico = new Sintatico();
+        Semantico semantico = new Semantico();
 
-        try {
-          Lexico lexico = new Lexico(codigo);
-          Token token;
-
-          while ((token = lexico.nextToken()) != null) {
-
-            int pos = token.getPosition();
-            int linha = 1;
-
-            for (int i = 0; i < pos && i < codigo.length(); i++) {
-              if (codigo.charAt(i) == '\n') {
-                linha++;
-              }
-            }
-
-            messageArea.append(
-              "linha " + linha + " - " +
-              getClasse(token.getId()) + " " +
-              token.getLexeme() + "\n"
-            );
-          }
-
-          messageArea.append("programa compilado com sucesso");
-
-        } catch (LexicalError ex) {
+        try{
+          sintatico.parse(lexico, semantico);
+        }catch(LexicalError ex){
           messageArea.setText(ex.getMessage());
+        }catch(SyntaticError ex){
+          System.out.println(ex.getMessage() + " em " + ex.getPosition());
+        }catch(SemanticError ex){
+
         }
       }
     });
 
     am.put("equipe", new AbstractAction() {
       public void actionPerformed(ActionEvent e) {
-        messageArea.setText("Equipe de Desenvolvimento:\n- Vinícius Gonsalves da Silva");
+        messageArea.setText("Equipe de Desenvolvimento:\n- Vinícius Gonsalves da Silva e Lucas Lewin Vilbert");
       }
     });
     
