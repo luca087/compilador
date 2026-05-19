@@ -49,7 +49,5 @@ public interface Constants extends ScannerConstants, ParserConstants
     int t_TOKEN_43 = 43; //"*"
     int t_TOKEN_44 = 44; //"/"
     int t_TOKEN_45 = 45; //"^"
-    int t_linha = 46;
-    int t_bloco = 47;
 
 }

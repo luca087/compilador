@@ -234,20 +234,34 @@ public class GUI extends JFrame {
       public void actionPerformed(ActionEvent e) {
 
         messageArea.setText("");
-        String codigo = editorArea.getText();
+        String texto = editorArea.getText();
+        String codigo = texto.replaceAll("[\n\t]", " ");
         Lexico lexico = new Lexico(codigo);
         Sintatico sintatico = new Sintatico();
         Semantico semantico = new Semantico();
 
         try{
           sintatico.parse(lexico, semantico);
+          messageArea.setText("código compilado com sucesso");
         }catch(LexicalError ex){
           messageArea.setText(ex.getMessage());
         }catch(SyntaticError ex){
-          System.out.println(ex.getMessage() + " em " + ex.getPosition());
+          var linhas = texto.split("\n");
+          var posicao = ex.getPosition();
+          var linha = 0;
+          for (int i = 0; i < linhas.length; i++){
+            posicao = posicao - (linhas[i].length() + 1);
+            linha = i+1;
+            if(posicao <= 0){
+              break;
+            }
+          }
+          messageArea.setText("linha " + linha+":\n" + ex.getMessage());
         }catch(SemanticError ex){
 
         }
+
+
       }
     });
 

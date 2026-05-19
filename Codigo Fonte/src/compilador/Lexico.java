@@ -26,41 +26,13 @@ public class Lexico implements Constants
         position = pos;
     }
 
-    private int getLine(int pos) {
-        int linha = 1;
-        for (int i = 0; i < pos && i < input.length(); i++) {
-            if (input.charAt(i) == '\n') {
-                linha++;
-            }
-        }
-        return linha;
-    }
-
-    private String consumirIdentificadorCompleto(String lexemeAtual) throws LexicalError {
-    StringBuilder sb = new StringBuilder(lexemeAtual);
-    while (position < input.length() && input.charAt(position) == '_') {
-        int pos = position + 1;
-        if (pos < input.length() && Character.isDigit(input.charAt(pos))) {
-            sb.append('_');
-            position++;
-            while (position < input.length() && Character.isDigit(input.charAt(position))) {
-                sb.append(input.charAt(position));
-                position++;
-            }
-        } else {
-            int linha = getLine(position);
-            throw new LexicalError("linha " + linha + ": identificador inválido");
-        }
-    }
-    return sb.toString();
-    }
-
     public Token nextToken() throws LexicalError
     {
-        if (!hasInput())
+        if ( ! hasInput() )
             return null;
 
         int start = position;
+
         int state = 0;
         int lastState = 0;
         int endState = -1;
@@ -73,6 +45,7 @@ public class Lexico implements Constants
 
             if (state < 0)
                 break;
+
             else
             {
                 if (tokenForState(state) >= 0)
@@ -82,53 +55,18 @@ public class Lexico implements Constants
                 }
             }
         }
-
-        if (endState < 0 || tokenForState(lastState) == -2)
-        {
-            int linha = getLine(start);
-            String msg = SCANNER_ERROR[lastState];
-
-            if (msg == null || msg.isEmpty() || msg.contains("Caractere") || msg.contains("esperado"))
-            {
-                msg = input.charAt(start) + " símbolo inválido";
-            }
-
-            if (msg.contains("cte_float"))
-                msg = "constante_float inválida";
-            else if (msg.contains("cte_char"))
-                msg = "constante_char inválida";
-            else if (msg.contains("cte_string"))
-                msg = "constante_string inválida";
-            else if (msg.contains("bloco"))
-                msg = "comentário inválido ou não finalizado";
-
-            throw new LexicalError("linha " + linha + ": " + msg);
-        }
+        if (endState < 0 || (endState != state && tokenForState(lastState) == -2))
+            throw new LexicalError(SCANNER_ERROR[lastState], start);
 
         position = end;
 
         int token = tokenForState(endState);
 
-        if (token == 0 || token == t_linha || token == t_bloco)
+        if (token == 0)
             return nextToken();
         else
         {
             String lexeme = input.substring(start, end);
-
-            if (token == t_cte_int) {
-                if (position < input.length() && input.charAt(position) == '.') {
-                    int nextPos = position + 1;
-                    if (nextPos >= input.length() || !Character.isDigit(input.charAt(nextPos))) {
-                        int linha = getLine(start);
-                        throw new LexicalError("linha " + linha + ": constante_float inválida");
-                    }
-                }
-            }
-
-            if (token == t_id) {
-                lexeme = consumirIdentificadorCompleto(lexeme);
-            }
-
             token = lookupToken(token, lexeme);
             return new Token(token, lexeme, start);
         }
@@ -147,7 +85,7 @@ public class Lexico implements Constants
                 return SCANNER_TABLE[half][1];
             else if (SCANNER_TABLE[half][0] < c)
                 start = half+1;
-            else
+            else  //(SCANNER_TABLE[half][0] > c)
                 end = half-1;
         }
 
@@ -176,7 +114,7 @@ public class Lexico implements Constants
                 return SPECIAL_CASES_VALUES[half];
             else if (comp < 0)
                 start = half+1;
-            else
+            else  //(comp > 0)
                 end = half-1;
         }
 
