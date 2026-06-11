@@ -1,0 +1,156 @@
+#Options
+GenerateScanner = true
+GenerateParser = true
+Language = Java
+ScannerName = Lexico
+ParserName = Sintatico
+SemanticName = Semantico
+ScannerCaseSensitive = true
+ScannerTable = Compact
+Input = String
+Parser = LL
+#RegularDefinitions
+min : [a-z]
+digito : [0-9]
+#Tokens
+id:! {min}({min}|(_{digito}+))*
+cte_int:! {digito}+
+cte_float:! {digito}+\.{digito}+
+cte_char:! \\(n|s|t)
+cte_string:! \"([^\n\"\\%]|(%x))*\"
+
+//palavras reservadas
+pr_ask = id: "ask"
+pr_bool = id: "bool"
+pr_char = id: "char"
+pr_define = id: "define"
+pr_end = id: "end"
+pr_elif = id: "elif"
+pr_else = id: "else"
+pr_false = id: "false"
+pr_float = id: "float"
+pr_if = id: "if"
+pr_int = id: "int"
+pr_main = id: "main"
+pr_repeat = id: "repeat"
+pr_string = id: "string"
+pr_tell = id: "tell"
+pr_true = id: "true"
+pr_until = id: "until"
+pr_while = id: "while"
+
+//simbolos especiais
+":"
+";"
+","
+"="
+"<-"
+"("
+")"
+"&&"
+"||"
+"!"
+"=="
+"!="
+"<"
+"<="
+">"
+">="
+"+"
+"-"
+"*"
+"/"
+"^"
+
+//caracteres de formatação
+: [n\s\t]
+
+:! #[^\n]*
+:! \{\n[^\{\}]*\n\}
+#NonTerminals
+<forma_geral>
+<declaracao_de_variaveis>
+<variavel>
+<tipo>
+<lista_de_identificadores>
+<umIdentificador>
+<lista_de_instrucoes>
+<umInstrucao>
+<instrucao>
+<atribuicao>
+<repete>
+<fimAtribuicao>
+<entrada>
+<lista_de_entrada>
+<umEntrada>
+<preIdentificador>
+<saida>
+<lista_de_expressoes>
+<umExpressao>
+<selecao>
+<elif>
+<else>
+<repeticao>
+<condicionalRepeticao>
+<expressao>
+<expressao_>
+<termo_logico>
+<relacional>
+<relacional_>
+<operador_relacional>
+<aritmetica>
+<aritmetica_>
+<termo_aritmetico>
+<termo_aritmetico_>
+<fator>
+<fator_>
+<elemento>
+#Grammar
+<forma_geral> ::= pr_main #20 <declaracao_de_variaveis> <lista_de_instrucoes> pr_end #21 ;
+<declaracao_de_variaveis> ::= pr_define <variavel> <repete> | î  ;
+<repete> ::= <variavel> <repete> | î ;
+<variavel> ::=  <tipo> #22 ":" <lista_de_identificadores> #23 ";"  ;
+<tipo> ::= pr_bool | pr_char | pr_int | pr_float | pr_string  ;
+<lista_de_identificadores> ::= id #24 <umIdentificador> ;
+<umIdentificador> ::= "," <lista_de_identificadores> | î ;
+<lista_de_instrucoes> ::= <instrucao> ";" <umInstrucao> ;
+<umInstrucao> ::= <lista_de_instrucoes> | î ;
+<instrucao> ::= <atribuicao> | <entrada> | <saida> | <selecao> | <repeticao> ;
+<atribuicao>::= <lista_de_identificadores> <fimAtribuicao> ;
+<fimAtribuicao> ::= "=" <expressao> #25 | "<-" <expressao> #25 ;
+<entrada> ::= pr_ask "(" <lista_de_entrada> ")" ;
+<lista_de_entrada> ::= <preIdentificador> id #26 <umEntrada> ;
+<umEntrada> ::= "," <lista_de_entrada> | î ;
+<preIdentificador> ::= cte_string #19 #14 "," | î ;
+<saida> ::= pr_tell "(" <lista_de_expressoes> ")" ;
+<lista_de_expressoes> ::= <expressao> #14 <umExpressao> ;
+<umExpressao> ::= "," <lista_de_expressoes> | î ;
+<selecao> ::= pr_if <expressao> #27 <lista_de_instrucoes> <elif> #28 <else> pr_end #29 ;
+<elif> ::= #28 pr_elif <expressao> #30 <lista_de_instrucoes> <elif> | î ;
+<else> ::= pr_else <lista_de_instrucoes> | î ;
+<repeticao>::= pr_repeat #32 <lista_de_instrucoes> <condicionalRepeticao> ;
+<condicionalRepeticao> ::= pr_while <expressao> #33 | pr_until <expressao> #34 ;
+
+
+
+<expressao> ::= <termo_logico> <expressao_> ;
+<expressao_> ::= î | "&&" <termo_logico> #15 <expressao_> | "||" <termo_logico> #16 <expressao_> ;
+<termo_logico> ::= <relacional> | pr_true #11 | pr_false #12 | "!" <termo_logico> #13 ;
+<relacional> ::= <aritmetica> <relacional_> ;
+<relacional_> ::= î | <operador_relacional> #9 <aritmetica> #10 ;
+<operador_relacional>::= "==" | "!=" | "<" | "<=" | ">" |">=" ;
+<aritmetica> ::= <termo_aritmetico> <aritmetica_> ;
+<aritmetica_> ::= î | "+" <termo_aritmetico> #1 <aritmetica_> |
+ "-" <termo_aritmetico> #2 <aritmetica_> ;
+<termo_aritmetico> ::= <fator> <termo_aritmetico_> ;
+<termo_aritmetico_> ::= î | "*" <fator> #3 <termo_aritmetico_> | "/" <fator> #4 <termo_aritmetico_> ;
+<fator> ::= <elemento> <fator_> ;
+<fator_> ::= î | "^" <elemento> #17 <fator_> ;
+<elemento> ::= id #31 |
+ cte_int #5 |
+ cte_float #6 |
+ cte_char #18 |
+ cte_string #19 |
+ "(" <expressao> ")" |
+ "+" <elemento> #7 |
+ "-" <elemento> #8 ; 
