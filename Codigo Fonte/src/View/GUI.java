@@ -258,7 +258,7 @@ public class GUI extends JFrame {
           }
           messageArea.setText("linha " + linha+":\n" + ex.getMessage());
         }catch(SemanticError ex){
-
+          messageArea.setText(ex.getMessage());
         }
 
 
