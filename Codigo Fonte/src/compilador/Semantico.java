@@ -64,6 +64,14 @@ public class Semantico implements Constants {
         //WIP
     }
 
+    ///
+    /// TRABALHO FINAL - parte 4: implementação de compatibilidade de tipos
+    /// A <expressao> de comandos de <seleção> e de <repetição> devem ser do tipo bool.
+    /// EQUIPE 13: implemente a compatibilidade de tipos da ação #33, de tal forma que se a <expressao> da cláusula
+    /// while não for do tipo compatível deve-se encerrar a execução e apontar erro semântico, indicando a linha e
+    /// apresentando a mensagem "tipo incompatível em comando de repetição <repeat-while>"
+    ///
+
     private void acao33() {
         var tipo1 = pilhaTipos.pop();
         var rotulo1 = pilhaRotulos.pop();
@@ -72,6 +80,8 @@ public class Semantico implements Constants {
     }
 
     private void acao32() {
+        pilhaRotulos.push("novo_rotulo");
+
         //WIP
     }
 
@@ -82,11 +92,13 @@ public class Semantico implements Constants {
     private void acao30() {
         var tipo1 = pilhaTipos.pop();
 
+        pilhaRotulos.push("novo_rotulo");
         //WIP
     }
 
     private void acao29() {
         var rotulo1 = pilhaRotulos.pop();
+
 
         //WIP
     }
@@ -105,16 +117,36 @@ public class Semantico implements Constants {
     private void acao27() {
         var tipo1 = pilhaTipos.pop();
 
+        pilhaRotulos.push("novo_rotulo1");
+        pilhaRotulos.push("novo_rotulo2");
+
     }
 
-    private void acao26(Token token) {
+    private void acao26(Token token) throws SemanticError {
+        var id = token.getLexeme();
+        if(tipo == "bool" || tipo == "char"){
+            throw new SemanticError(id+" - identificador inválido para comando de entrada");
+        }
+
+
         //WIP
     }
 
     private void acao25() {
         var tipo1 = pilhaTipos.pop();
 
-        //WIP
+        if(tipo1 == "int64"){
+            codigoObjeto.append("conv.i8");
+        }
+        for (int i = 0; i < listaIdentificadores.size() -1; i++){
+            codigoObjeto.append("dup\n");
+        }
+
+        listaIdentificadores.forEach((id)->{
+            codigoObjeto.append("stloc "+id+"\n");
+        });
+
+        listaIdentificadores.clear();
     }
 
     private void acao24(Token token) {
@@ -122,10 +154,28 @@ public class Semantico implements Constants {
     }
 
     private void acao23() {
-        //WIP
+        listaIdentificadores.forEach((id)->{
+            var type = getILType(tipo);
+            tabelaSimbolos.put(type, id);
+            codigoObjeto.append(".locals("+type+" "+id+")\n");
+        });
+
+        listaIdentificadores.clear();
+    }
+
+    private String getILType(String type){
+        switch (type){
+            case "int":
+                return "int64";
+            case "float":
+                return "float64";
+            default:
+                return type;
+        }
     }
 
     private void acao22(Token token) {
+
         tipo = token.getLexeme();
     }
 
@@ -172,10 +222,27 @@ public class Semantico implements Constants {
         var tipo1 = pilhaTipos.pop();
         var tipo2 = pilhaTipos.pop();
 
+        pilhaTipos.push("bool");
+
+        switch (operadorRelacional){
+            case ">":
+                break;
+            case ">=":
+                break;
+            case "<":
+                break;
+            case "<=":
+                break;
+            case "==":
+                break;
+            case "!=":
+                break;
+        }
         //WIP
     }
 
     private void acao9(Token token) {
+
         operadorRelacional = token.getLexeme();
     }
 
