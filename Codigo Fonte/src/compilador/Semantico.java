@@ -10,51 +10,128 @@ public class Semantico implements Constants {
    private String operadorRelacional = "";
    private String tipo = "";
    private Stack<String> pilhaRotulos = new Stack<>();
+   private int indiceRotulo = 0;
    private List<String> listaIdentificadores = new ArrayList<>();
    private Dictionary<String, String> tabelaSimbolos = new Hashtable<>();
 
 
    public void executeAction(int action, Token token) throws SemanticError {
-      System.out.println("Acao #"+action+", Token: "+token);
+      try {
+          System.out.println("Acao #" + action + ", Token: " + token);
 
-      switch (action) {
-         case  1:  acao1(); break;
-         case  2:  acao2(); break;
-         case  3:  acao3(); break;
-         case  4:  acao4(); break;
-         case  5:  acao5(token); break;
-         case  6:  acao6(token); break;
-         case  7:  acao7(); break;
-         case  8:  acao8(); break;
-         case  9:  acao9(token); break;
-         case  10:  acao10(); break;
-         case 11: acao11(); break;
-         case 12: acao12(); break;
-         case 13: acao13(); break;
-         case 14: acao14(); break;
-         case  15:  acao15(); break;
-         case  16:  acao16(); break;
-         case  17:  acao17(); break;
-         case  18:  acao18(); break;
-         case  19:  acao19(); break;
-         case 20: acao20(); break;
-         case 21: acao21(); break;
-          case  22:  acao22(token); break;
-          case  23:  acao23(); break;
-          case  24:  acao24(token); break;
-          case 25: acao25(); break;
-          case 26: acao26(token); break;
-          case  27:  acao27(); break;
-          case 28: acao28(); break;
-          case 29: acao29(); break;
-          case  30:  acao30(); break;
-          case  31:  acao31(); break;
-          case  32:  acao32(); break;
-          case 33: acao33(); break;
-          case 34: acao34(); break;
-         default:
+          switch (action) {
+              case 1:
+                  acao1();
+                  break;
+              case 2:
+                  acao2();
+                  break;
+              case 3:
+                  acao3();
+                  break;
+              case 4:
+                  acao4();
+                  break;
+              case 5:
+                  acao5(token);
+                  break;
+              case 6:
+                  acao6(token);
+                  break;
+              case 7:
+                  acao7();
+                  break;
+              case 8:
+                  acao8();
+                  break;
+              case 9:
+                  acao9(token);
+                  break;
+              case 10:
+                  acao10();
+                  break;
+              case 11:
+                  acao11();
+                  break;
+              case 12:
+                  acao12();
+                  break;
+              case 13:
+                  acao13();
+                  break;
+              case 14:
+                  acao14();
+                  break;
+              case 15:
+                  acao15();
+                  break;
+              case 16:
+                  acao16();
+                  break;
+              case 17:
+                  acao17();
+                  break;
+              case 18:
+                  acao18(token);
+                  break;
+              case 19:
+                  acao19(token);
+                  break;
+              case 20:
+                  acao20();
+                  break;
+              case 21:
+                  acao21();
+                  break;
+              case 22:
+                  acao22(token);
+                  break;
+              case 23:
+                  acao23();
+                  break;
+              case 24:
+                  acao24(token);
+                  break;
+              case 25:
+                  acao25();
+                  break;
+              case 26:
+                  acao26(token);
+                  break;
+              case 27:
+                  acao27();
+                  break;
+              case 28:
+                  acao28();
+                  break;
+              case 29:
+                  acao29();
+                  break;
+              case 30:
+                  acao30();
+                  break;
+              case 31:
+                  acao31(token);
+                  break;
+              case 32:
+                  acao32();
+                  break;
+              case 33:
+                  acao33();
+                  break;
+              case 34:
+                  acao34();
+                  break;
+              default:
                   throw new SemanticError("Acao semantica nao implementada: " + action);
+          }
+      }catch(SemanticError se){
+          throw  se;
       }
+      catch(Exception e)
+      {
+        throw  new SemanticError("Erro semântico!");
+       }
    }
 
     private void acao34() {
@@ -85,7 +162,9 @@ public class Semantico implements Constants {
         //WIP
     }
 
-    private void acao31() {
+    private void acao31(Token token) {
+        pilhaTipos.push(tipo);
+
 
     }
 
@@ -124,8 +203,8 @@ public class Semantico implements Constants {
 
     private void acao26(Token token) throws SemanticError {
         var id = token.getLexeme();
-        if(tipo == "bool" || tipo == "char"){
-            throw new SemanticError(id+" - identificador inválido para comando de entrada");
+        if(tipo.equals("bool") || tipo.equals("char")){
+            throw new SemanticError(id+" - identificador inválido para comando de entrada", token.getPosition());
         }
 
 
@@ -150,8 +229,11 @@ public class Semantico implements Constants {
     }
 
     private void acao24(Token token) {
+
         listaIdentificadores.add(token.getLexeme());
     }
+
+
 
     private void acao23() {
         listaIdentificadores.forEach((id)->{
@@ -179,15 +261,16 @@ public class Semantico implements Constants {
         tipo = token.getLexeme();
     }
 
-    private void acao19() {
+    private void acao19(Token token) {
         pilhaTipos.push("string");
-
+        codigoObjeto.append("ldcstr "+token.getLexeme());
         //WIP
     }
 
-    private void acao18() {
+    private void acao18(Token token) {
        pilhaTipos.push("char");
 
+        codigoObjeto.append("ldc.i4 "+(int)token.getLexeme().charAt(0));
        //WIP
     }
 
@@ -206,6 +289,9 @@ public class Semantico implements Constants {
 
         pilhaTipos.push("bool");
 
+        codigoObjeto.append("add\n");
+        codigoObjeto.append("ldc.i4 0\n");
+        codigoObjeto.append("cgt\n");
         //WIP
     }
 
@@ -215,6 +301,9 @@ public class Semantico implements Constants {
 
         pilhaTipos.push("bool");
 
+        codigoObjeto.append("add\n");
+        codigoObjeto.append("ldc.i4 2\n");
+        codigoObjeto.append("ceq\n");
         //WIP
     }
 
@@ -226,24 +315,39 @@ public class Semantico implements Constants {
 
         switch (operadorRelacional){
             case ">":
+                codigoObjeto.append("cgt\n");
                 break;
             case ">=":
+                codigoObjeto.append("clt\n");
+                codigoObjeto.append("ldc.i4 0\n");
+                codigoObjeto.append("ceq\n");
                 break;
             case "<":
+                codigoObjeto.append("clt\n");
                 break;
             case "<=":
+                codigoObjeto.append("cgt\n");
+                codigoObjeto.append("ldc.i4 0\n");
+                codigoObjeto.append("ceq\n");
                 break;
             case "==":
+                codigoObjeto.append("ceq\n");
                 break;
             case "!=":
+                codigoObjeto.append("ceq\n");
+                codigoObjeto.append("ldc.i4 0\n");
+                codigoObjeto.append("ceq\n");
                 break;
         }
-        //WIP
+
     }
 
     private void acao9(Token token) {
 
         operadorRelacional = token.getLexeme();
+
+
+
     }
 
     private void acao1() {

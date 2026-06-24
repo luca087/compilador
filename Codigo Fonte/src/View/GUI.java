@@ -243,22 +243,10 @@ public class GUI extends JFrame {
         try{
           sintatico.parse(lexico, semantico);
           messageArea.setText("código compilado com sucesso");
-        }catch(LexicalError ex){
-          messageArea.setText(ex.getMessage());
-        }catch(SyntaticError ex){
-          var linhas = texto.split("\n");
-          var posicao = ex.getPosition();
-          var linha = 0;
-          for (int i = 0; i < linhas.length; i++){
-            posicao = posicao - (linhas[i].length() + 1);
-            linha = i+1;
-            if(posicao <= 0){
-              break;
-            }
-          }
-          messageArea.setText("linha " + linha+":\n" + ex.getMessage());
-        }catch(SemanticError ex){
-          messageArea.setText(ex.getMessage());
+        }
+        catch(AnalysisError ex){
+          var linha = getLinha(texto, ex.getPosition());
+          messageArea.setText("linha " + linha+":\n\t" + ex.getMessage());
         }
 
 
@@ -280,6 +268,19 @@ public class GUI extends JFrame {
     btnRecortar.addActionListener(am.get("recortar"));
     btnCompilar.addActionListener(am.get("compilar"));
     btnEquipe.addActionListener(am.get("equipe"));
+  }
+
+  private int getLinha(String texto, int posicao){
+    var linhas = texto.split("\n");
+    var linha = 0;
+    for (int i = 0; i < linhas.length; i++){
+      posicao = posicao - (linhas[i].length() + 1);
+      linha = i+1;
+      if(posicao <= 0){
+        break;
+      }
+    }
+    return  linha;
   }
 
   public static void main(String[] args) {
