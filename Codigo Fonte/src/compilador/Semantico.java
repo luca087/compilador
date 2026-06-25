@@ -117,7 +117,7 @@ public class Semantico implements Constants {
                   acao32();
                   break;
               case 33:
-                  acao33();
+                  acao33(token);
                   break;
               case 34:
                   acao34();
@@ -138,6 +138,8 @@ public class Semantico implements Constants {
         var tipo1 = pilhaTipos.pop();
         var rotulo1 = pilhaRotulos.pop();
 
+
+        codigoObjeto.append("brfalse "+rotulo1+"\n");
         //WIP
     }
 
@@ -149,16 +151,21 @@ public class Semantico implements Constants {
     /// apresentando a mensagem "tipo incompatível em comando de repetição <repeat-while>"
     ///
 
-    private void acao33() {
+    private void acao33(Token token) throws SemanticError {
         var tipo1 = pilhaTipos.pop();
+        if(!tipo1.equals("bool")){
+            throw new SemanticError("tipo incompatível em comando de repetição <repeat-while>", token.getPosition());
+        }
         var rotulo1 = pilhaRotulos.pop();
 
+        codigoObjeto.append("brtrue "+rotulo1+"\n");
         //WIP
     }
 
     private void acao32() {
-        pilhaRotulos.push("novo_rotulo");
-
+        var rotulo = "rotulo_"+indiceRotulo++;
+        pilhaRotulos.push(rotulo);
+        codigoObjeto.append(rotulo+":\n");
         //WIP
     }
 
@@ -171,14 +178,16 @@ public class Semantico implements Constants {
     private void acao30() {
         var tipo1 = pilhaTipos.pop();
 
-        pilhaRotulos.push("novo_rotulo");
+        var rotulo = "rotulo_"+indiceRotulo++;
+        pilhaRotulos.push(rotulo);
+        codigoObjeto.append("brfalse "+rotulo+"\n");
         //WIP
     }
 
     private void acao29() {
         var rotulo1 = pilhaRotulos.pop();
 
-
+        codigoObjeto.append(rotulo1+":\n");
         //WIP
     }
 
@@ -186,18 +195,19 @@ public class Semantico implements Constants {
         var rotulo1 = pilhaRotulos.pop();
         var rotulo2 = pilhaRotulos.pop();
 
+        codigoObjeto.append("br "+rotulo2+"\n");
         //WIP
 
         pilhaRotulos.push(rotulo2);
-
+        codigoObjeto.append(rotulo1+":\n");
         //WIP
     }
 
     private void acao27() {
         var tipo1 = pilhaTipos.pop();
 
-        pilhaRotulos.push("novo_rotulo1");
-        pilhaRotulos.push("novo_rotulo2");
+        pilhaRotulos.push("rotulo_"+indiceRotulo++);
+        pilhaRotulos.push("rotulo_"+indiceRotulo++);
 
     }
 
@@ -206,7 +216,17 @@ public class Semantico implements Constants {
         if(tipo.equals("bool") || tipo.equals("char")){
             throw new SemanticError(id+" - identificador inválido para comando de entrada", token.getPosition());
         }
-
+        codigoObjeto.append("call string\n");
+        codigoObjeto.append("[mscorlib]System.Console::ReadLine()\n");
+        codigoObjeto.append("call "+tipo+"\n");
+        String className;
+        if(tipo.equals("int64")){
+            className = "Int64";
+        }else{
+            className = "Float64";
+        }
+        codigoObjeto.append("[mscorlib]System."+className+"::Parse(string)\n");
+        codigoObjeto.append("stloc "+id+"\n");
 
         //WIP
     }
@@ -280,6 +300,7 @@ public class Semantico implements Constants {
 
         pilhaTipos.push("int64");
 
+        codigoObjeto.append("[mscorlib]System.Math::Pow(float64,float64)\n");
         //WIP
     }
 
@@ -345,9 +366,6 @@ public class Semantico implements Constants {
     private void acao9(Token token) {
 
         operadorRelacional = token.getLexeme();
-
-
-
     }
 
     private void acao1() {
