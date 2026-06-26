@@ -283,14 +283,14 @@ public class Semantico implements Constants {
 
     private void acao19(Token token) {
         pilhaTipos.push("string");
-        codigoObjeto.append("ldcstr "+token.getLexeme());
+        codigoObjeto.append("ldcstr "+token.getLexeme()+"\n");
         //WIP
     }
 
     private void acao18(Token token) {
        pilhaTipos.push("char");
 
-        codigoObjeto.append("ldc.i4 "+(int)token.getLexeme().charAt(0));
+       codigoObjeto.append("ldc.i4 "+(int)token.getLexeme().charAt(0)+"\n");
        //WIP
     }
 

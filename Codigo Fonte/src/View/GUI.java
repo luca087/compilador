@@ -243,12 +243,20 @@ public class GUI extends JFrame {
         try{
           sintatico.parse(lexico, semantico);
           messageArea.setText("código compilado com sucesso");
+          if(arquivoAtual != null){
+            var file = new File(arquivoAtual.getAbsolutePath().replaceAll(arquivoAtual.getName(),"")+"\\"+arquivoAtual.getName()+".codigo_objeto.il");
+          try (BufferedWriter bw = new BufferedWriter(new FileWriter(file))) {
+            var codigoObjeto = semantico.getCodigoObjeto();
+            bw.write(codigoObjeto, 0, codigoObjeto.length());
+          } catch (IOException ex) {
+            JOptionPane.showMessageDialog(null, "Erro ao salvar arquivo.");
+          }
+          }
         }
         catch(AnalysisError ex){
           var linha = getLinha(texto, ex.getPosition());
           messageArea.setText("linha " + linha+":\n\t" + ex.getMessage());
         }
-
 
       }
     });
